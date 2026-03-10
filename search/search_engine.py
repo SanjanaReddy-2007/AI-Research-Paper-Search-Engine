@@ -1,20 +1,28 @@
-from .vectorizer import build_vectorizer
-from .similarity import compute_similarity
+from database.db import get_all_papers
+from search.vectorizer import PaperVectorizer
+from search.similarity import compute_similarity
 
-# Build when the app starts
-vectorizer, tfidf_matrix, papers = build_vectorizer()
+class SearchEngine:
 
-def search_papers(query, top_k=5):
-    scores = compute_similarity(query, vectorizer, tfidf_matrix)
+    def __init__(self):
+        self.vectorizer = PaperVectorizer()
+        self.vectorizer.build_index()
 
-    ranked_indices = scores.argsort()[::-1][:top_k]
+    def search(self, query, top_k=5):
 
-    results = []
-    for idx in ranked_indices:
-        results.append({
-            "title": papers[idx]["title"],
-            "abstract": papers[idx]["abstract"],
-            "score": float(scores[idx])
-        })
+        vectorizer = self.vectorizer.get_vectorizer()
+        tfidf_matrix = self.vectorizer.get_matrix()
+        papers = self.vectorizer.get_papers()
 
-    return results
+        query_vector = vectorizer.transform([query])
+
+        similarity = compute_similarity(query_vector, tfidf_matrix)
+
+        ranked_indices = similarity.argsort()[0][::-1]
+
+        results = []
+
+        for i in ranked_indices[:top_k]:
+            results.append(papers[i])
+
+        return results

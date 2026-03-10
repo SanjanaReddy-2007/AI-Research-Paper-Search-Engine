@@ -1,22 +1,33 @@
-# This file load papers, build TF-IDF matrix and return vectorizer+matrix
-
-import json
 from sklearn.feature_extraction.text import TfidfVectorizer
+from database.db import get_all_papers
 
-def build_vectorizer(json_path="papers.json"):
-    # Loading the papers in papers.json
-    with open(json_path, "r", encoding="utf-8") as f:
-        papers = json.load(f)
+class PaperVectorizer:
 
-    # Combine both title and abstract
-    documents = []
-    for paper in papers:
-        text = paper["title"]+" "+paper["abstract"]
-        documents.append(text)
+    def __init__(self):
+        self.vectorizer = TfidfVectorizer(stop_words="english")
+        self.tfidf_matrix = None
+        self.papers = []
 
-    vectorizer = TfidfVectorizer(stop_words="english")
-    tfidf_matrix = vectorizer.fit_transform(documents)
+    def build_index(self):
+        # load papers from mongodb
+        self.papers = get_all_papers()
 
-    return vectorizer, tfidf_matrix, papers
+        documents = []
 
+        for paper in self.papers:
+            text = paper["cleaned_title"] + " " + paper["cleaned_abstract"]
+            documents.append(text)
 
+        # build tfidf matrix
+        self.tfidf_matrix = self.vectorizer.fit_transform(documents)
+
+        print("TF-IDF index built successfully")
+
+    def get_matrix(self):
+        return self.tfidf_matrix
+
+    def get_vectorizer(self):
+        return self.vectorizer
+
+    def get_papers(self):
+        return self.papers
