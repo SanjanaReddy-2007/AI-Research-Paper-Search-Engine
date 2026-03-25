@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Results - Find The Paper</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #e0f2fe, #eef2ff, #fff7ed);
+    margin: 0;
+    color: #1f2937;
+}
+
+/* HEADER */
+header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-bottom: 2px solid #e0e7ff;
+}
+
+/* SEARCH BAR */
+.search-bar {
+    display: flex;
+    gap: 10px;
+}
+
+.search-bar input {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #cbd5f5;
+    width: 320px;
+    outline: none;
+    transition: 0.3s;
+    background: #f9fafb;
+}
+
+.search-bar input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
+}
+
+/* COLORFUL BUTTON */
+.search-bar button {
+    padding: 10px 18px;
+    border: none;
+    background: linear-gradient(135deg, #f97316, #facc15);
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.search-bar button:hover {
+    transform: scale(1.07);
+    box-shadow: 0 6px 18px rgba(249,115,22,0.4);
+}
+
+/* CONTAINER */
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 30px 20px;
+}
+
+/* RESULT CARD */
+.result-item {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 20px;
+    border-left: 6px solid transparent;
+    border-image: linear-gradient(180deg, #3b82f6, #f97316) 1;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    transition: 0.3s;
+}
+
+.result-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* TITLE */
+.result-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2563eb;
+    cursor: pointer;
+}
+
+.result-title:hover {
+    color: #ea580c;
+    text-decoration: underline;
+}
+
+/* TAGS */
+.tag {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 4px 4px 0 0;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+/* MULTI-COLOR TAG SYSTEM */
+.tag:nth-child(1) { background: #3b82f6; } /* blue */
+.tag:nth-child(2) { background: #6366f1; } /* indigo */
+.tag:nth-child(3) { background: #10b981; } /* green */
+.tag:nth-child(4) { background: #f59e0b; } /* yellow */
+.tag:nth-child(5) { background: #f97316; } /* orange */
+.tag:nth-child(6) { background: #ef4444; } /* red */
+
+/* LINKS */
+.links {
+    margin-top: 12px;
+}
+
+.links a {
+    margin-right: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #2563eb;
+    position: relative;
+    transition: 0.2s;
+}
+
+.links a::after {
+    content: "";
+    display: block;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, #3b82f6, #f97316);
+    transition: 0.3s;
+}
+
+.links a:hover::after {
+    width: 100%;
+}
+
+.links a:hover {
+    color: #ea580c;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>Find The Paper</h2>
+
+    <!-- 🔥 SEARCH BAR -->
+    <form id="searchBar" class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search papers again...">
+        <button type="submit">Search</button>
+    </form>
+
+</header>
+
+<div class="container">
+    <h2 id="resultsTitle">Results</h2>
+    <div id="resultsContainer">Loading...</div>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const query = urlParams.get('query') || '';
+
+// Title
+if (query) {
+    document.getElementById('resultsTitle').textContent = `Results for "${query}"`;
+}
+
+// 🔥 LOAD RESULTS
+async function loadResults() {
+
+    document.getElementById('resultsContainer').innerHTML = "<p>Loading...</p>";
+
+    try {
+        const response = await fetch('/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: query.trim() })
+        });
+
+        const data = await response.json();
+        console.log("Received:", data);
+
+        if (data && data.papers) {
+            displayResults(data.papers);
+        } else {
+            document.getElementById('resultsContainer').innerHTML =
+                "<h3>No data received</h3>";
+        }
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById('resultsContainer').innerHTML =
+            "<h3>Something went wrong 😢</h3>";
+    }
+}
+
+// 🔥 DISPLAY RESULTS
+function displayResults(results) {
+    const container = document.getElementById('resultsContainer');
+
+    if (!results || results.length === 0) {
+        container.innerHTML = "<h3>No results found 😢</h3>";
+        return;
+    }
+
+    let html = '';
+
+    results.forEach(paper => {
+
+        // FIX: subjects may be string → convert to array
+        let subjects = [];
+        if (typeof paper.subjects === "string") {
+            subjects = paper.subjects.split(';');
+        } else if (Array.isArray(paper.subjects)) {
+            subjects = paper.subjects;
+        }
+
+        html += `
+        <div class="result-item">
+
+            <a href="${paper.url}" target="_blank" class="result-title">
+                ${escapeHtml(paper.title)}
+            </a>
+
+            <p>${escapeHtml(paper.abstract || "No abstract available")}</p>
+
+            <p><b>Authors:</b> ${escapeHtml(paper.authors || "Unknown")}</p>
+
+            <div>
+                ${subjects.map(s => 
+                    `<span class="tag">${escapeHtml(s.trim())}</span>`
+                ).join('')}
+            </div>
+
+            <div class="links">
+                <a href="${paper.url}" target="_blank">🔗 Open Paper</a>
+
+                ${paper.pdf_link !== "N/A" ? `
+                    <a href="${paper.pdf_link}" target="_blank">📄 PDF</a>
+                ` : ""}
+            </div>
+
+        </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// 🔥 SEARCH AGAIN (TOP BAR)
+document.getElementById("searchBar").addEventListener("submit", function(e){
+    e.preventDefault();
+    const newQuery = document.getElementById("searchInput").value.trim();
+
+    if(newQuery){
+        window.location.href = `/results?query=${encodeURIComponent(newQuery)}`;
+    }
+});
+
+// ESCAPE
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// LOAD
+window.onload = function () {
+    if (query) {
+        loadResults();
+    } else {
+        document.getElementById('resultsContainer').innerHTML =
+            "<h2>No query provided</h2>";
+    }
+};
+</script>
+
+</body>
+</html>

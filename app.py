@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from search.search_engine import SearchEngine
 
 app = Flask(__name__)
@@ -11,16 +11,37 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/search")
+# ✅ ADD THIS ROUTE
+@app.route("/results")
+def results_page():
+    return render_template("results.html")
+
+
+@app.route("/search", methods=["POST"])
 def search():
-    query = request.args.get("query")
+    try:
+        data = request.get_json()
+        query = data.get("query")
 
-    if not query:
-        return render_template("results.html", papers=[])
+        print("Query received:", query)
 
-    papers = engine.search(query)
+        if not query:
+            return jsonify({"papers": []})
 
-    return render_template("results.html", papers=papers)
+        papers = engine.search(query)
+
+        print("Results found:", len(papers))
+
+        # Fix ObjectId
+        for paper in papers:
+            if "_id" in paper:
+                paper["_id"] = str(paper["_id"])
+
+        return jsonify({"papers": papers})
+
+    except Exception as e:
+        print("ERROR:", str(e))
+        return jsonify({"papers": []})
 
 
 if __name__ == "__main__":

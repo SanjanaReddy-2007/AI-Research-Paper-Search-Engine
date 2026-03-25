@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperScope AI - Intelligent Academic Discovery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1e4d8b;
+            --secondary-color: #2563eb;
+            --accent-color: #06b6d4;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --success-color: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .left-section {
+            color: white;
+        }
+
+        .ai-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #06b6d4, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .search-box-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            outline: none;
+            background: var(--light-bg);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-light);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1rem;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tag:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .right-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card.large {
+            grid-column: 1 / -1;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-description {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .how-it-works {
+            background: var(--dark-bg);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .how-it-works h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .how-it-works ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .how-it-works li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .how-it-works li::before {
+            content: "✓";
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .right-section {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">FP</div>
+                <span>Find The Paper</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="content-wrapper">
+            <div class="left-section">
+                <h1>Find papers by <span class="highlight">meaning</span>, not just keywords</h1>
+                <p class="description">Search research across AI, robotics, healthcare, data science, and more. Our engine ranks papers using vector-based similarity so relevant work surfaces faster.</p>
+
+                <div class="search-box-wrapper">
+                    <form class="search-form" id="searchForm" action="/results" method="GET">
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            id="queryInput" 
+                            placeholder="Try: transformer models for medical imaging" 
+                            required
+                        >
+                        <button type="submit" class="search-btn">Search</button>
+                    </form>
+                    <div id="errorMessage" class="error-message"></div>
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 0.5rem;">Searching papers...</p>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.9rem; margin-bottom: 1rem;">Try popular searches:</p>
+                <div class="tags" id="popularSearches">
+                    <span class="tag" onclick="searchTag('Machine Learning')">Machine Learning</span>
+                    <span class="tag" onclick="searchTag('Computer Vision')">Computer Vision</span>
+                    <span class="tag" onclick="searchTag('NLP')">NLP</span>
+                    <span class="tag" onclick="searchTag('Bioinformatics')">Bioinformatics</span>
+                </div>
+            </div>
+
+            <div class="right-section">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">10K+</div>
+                    <div class="feature-description">Papers indexed</div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">Fast</div>
+                    <div class="feature-description">Query response</div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <div class="feature-title">AI-first</div>
+                    <div class="feature-description">Smart relevance ranking</div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <div class="feature-title">Clean</div>
+                    <div class="feature-description">Simple research workflow</div>
+                </div>
+
+                <div class="feature-card large">
+                    <div class="how-it-works">
+                        <h3>How it works</h3>
+                        <ul>
+                            <li>Crawls academic paper sources</li>
+                            <li>Converts paper text into TF-IDF vectors</li>
+                            <li>Uses cosine similarity for ranking</li>
+                            <li>Returns contextually relevant results</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("searchForm");
+        const input = document.getElementById("queryInput");
+        const loading = document.getElementById("loading");
+        const errorMessage = document.getElementById("errorMessage");
+
+        // Handle form submit
+        form.addEventListener("submit", function (e) {
+            e.preventDefault(); // stop default POST
+
+            const query = input.value.trim();
+
+            if (!query) {
+                errorMessage.textContent = "Please enter a search query";
+                return;
+            }
+
+            // show loading
+            loading.style.display = "block";
+            errorMessage.textContent = "";
+
+            // redirect to results page
+            window.location.href = `/results?query=${encodeURIComponent(query)}`;
+        });
+
+        // Handle tag clicks
+        function searchTag(tag) {
+            window.location.href = `/results?query=${encodeURIComponent(tag)}`;
+        }
+    </script>
+</body>
+</html>

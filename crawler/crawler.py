@@ -27,7 +27,7 @@ def get_listing_page(category, skip):
     response = requests.get(url, headers=headers)
 
     if response.status_code != 200:
-        print("Failed to fetch {category}")
+        print(f"Failed to fetch {category}")
         return None
     
     return response.text
@@ -39,7 +39,7 @@ def extract_paper_links(html):
     paper_links = []
     for link in links:
         href = link.get("href")
-        if href:
+        if isinstance(href,str):
             paper_links.append(BASE_URL + href)
 
     return paper_links
@@ -65,8 +65,8 @@ def extract_paper_details(url, category):
     subjects_tag = soup.find("div", class_="subheader")
     subjects = subjects_tag.text.replace("Subjects:", "").strip() if subjects_tag else "N/A"
 
-    pdf_tag = soup.find("a", href=lambda x: x and x.startswith("/pdf/"))
-    pdf_link = BASE_URL + pdf_tag["href"] if pdf_tag else "N/A"
+    pdf_tag = soup.find("a", href=lambda x: isinstance(x, str) and x.startswith("/pdf/"))
+    pdf_link = BASE_URL + str(pdf_tag["href"]) if pdf_tag else "N/A"
 
     paper_data = {
         "category": category,
